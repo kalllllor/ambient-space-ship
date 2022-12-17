@@ -9,8 +9,8 @@ export function DummySpaceship(props) {
     <group {...props} dispose={null}>
       <mesh
         geometry={nodes.Cube.geometry}
-        position={[0, 0.01, -0.01]}
-        scale={[7.56, 7.56, 15.12]}
+        position={props.position}
+        scale={props.scale}
       >
         <meshDepthMaterial color={"white"} />
       </mesh>
