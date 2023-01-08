@@ -20,7 +20,7 @@ const BaseCharacter = (props) => {
     mass: 1,
     type: "Dynamic",
 
-    position: [0, 10, 0],
+    position: [0, 20, 0],
     ...props,
   }));
 

@@ -1,7 +1,7 @@
 const Lights = () => {
   return (
     <>
-      <ambientLight intensity={1} />
+      <ambientLight intensity={10} />
       {/* <spotLight
         penumbra={0.5}
         position={[10, 10, 5]}

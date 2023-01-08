@@ -1,10 +1,15 @@
-import { usePlane } from "@react-three/cannon";
+import {
+  usePlane,
+  Debug,
+  useBox,
+} from "@react-three/cannon";
 
 const Floor = (props) => {
-  const [ref] = usePlane((index) => ({
+  const [ref] = useBox((index) => ({
     type: "Static",
     mass: 0,
-    ...props,
+    rotation: [Math.PI / -2, 0, 0],
+    scale: [1, 1, 1],
   }));
 
   return (
@@ -13,7 +18,7 @@ const Floor = (props) => {
       rotation={props.rotation}
       ref={ref}
     >
-      <planeGeometry args={[50, 50]} />
+      <planeGeometry scale={[1, 1, 1]} />
       <meshStandardMaterial color={props.color} />
     </mesh>
   );
