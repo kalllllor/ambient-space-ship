@@ -1,65 +1,53 @@
+import { Suspense } from "react";
+import { OrbitControls } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
+import { Spaceship } from "./components/models/Spaceship";
+import BaseCharacter from "./ui/BaseCharacter";
+import Galaxy from "./components/Galaxy/Galaxy";
+import Floor from "./components/Floor";
+import Cube from "./components/Cube";
 import {
-  OrbitControls,
-  TransformControls,
-  PivotControls,
-  Html,
-  MeshReflectorMaterial,
-  MeshWobbleMaterial,
-} from "@react-three/drei";
-import { useRef } from "react";
-
-export default function Experience() {
-  const boxRef = useRef(null);
-  const sphereRef = useRef(null);
-
+  EffectComposer,
+  Bloom,
+} from "@react-three/postprocessing";
+const Experience = () => {
   return (
     <>
-      <OrbitControls enableDamping makeDefault />
-      <directionalLight
-        position={[1, 2, 3]}
-        intensity={1.5}
+      <BaseCharacter
+        controls
+        position={[0, 3, 0]}
+        args={[2]}
+        color="yellow"
       />
-      <ambientLight intensity={0.5} />
-
-      <PivotControls
-        anchor={[0, 0, 0]}
-        depthTest={false}
-      >
-        <mesh position-x={-2} ref={sphereRef}>
-          <sphereGeometry />
-          <meshStandardMaterial color="orange" />
-        </mesh>
-      </PivotControls>
-
-      <mesh
-        position-x={2}
-        scale={1.5}
-        ref={boxRef}
-      >
-        <boxGeometry />
-        <Html
-          position={[0, 0.5, 0]}
-          distanceFactor={8}
-          wrapperClass="label"
-          center
-          occlude={[boxRef, sphereRef]}
-        >
-          Hehe XD
-        </Html>
-        <meshStandardMaterial color="mediumpurple" />
-      </mesh>
-      <TransformControls
-        object={boxRef}
-      ></TransformControls>
-
-      <mesh
-        position-y={-1}
-        rotation-x={-Math.PI * 0.5}
-        scale={10}
-      >
-        <planeGeometry />
-        <MeshWobbleMaterial color="greenyellow" />
-      </mesh>
+      <EffectComposer>
+        <Bloom mipmapBlur />
+      </EffectComposer>
+      {/* <OrbitControls makeDefault /> */}
+      <Suspense fallback={null}>
+        <Spaceship />
+      </Suspense>
+      {/*boundaries for movement */}
+      <Floor />
+      <Cube
+        scale={[5, 30, 5]}
+        position={[7.5, 3.5, 0]}
+      />
+      <Cube
+        scale={[5, 30, 5]}
+        position={[-7.5, 3.5, 0]}
+      />
+      <Cube
+        scale={[10, 5, 5]}
+        position={[0, 3.5, 17]}
+      />
+      <Cube
+        scale={[10, 5, 5]}
+        position={[0, 3.5, -17]}
+      />
+      <Galaxy />
     </>
   );
-}
+};
+
+export default Experience;
