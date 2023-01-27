@@ -1,13 +1,15 @@
 import MilkyWay from "./MilkyWay/MilkyWay";
-import Planet from "./Planet/Planet";
-import { Center } from "@react-three/drei";
+import Sun from "./Planet/Sun";
+import Neptun from "./Planet/Neptun";
+import Asteroids from "./Asteroids";
 
 const Galaxy = () => {
   return (
     <>
-      <Center>
-        <MilkyWay />
-      </Center>
+      <Asteroids />
+      <Sun />
+      <Neptun />
+      <MilkyWay />
     </>
   );
 };

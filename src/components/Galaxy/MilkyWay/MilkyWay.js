@@ -7,9 +7,11 @@ import {
 
 const MilkyWay = () => {
   return (
-    <Center>
-      <Sparkles count={1000} scale={[2, 2, 10]} />
-    </Center>
+    <Sparkles
+      count={2000}
+      scale={[7, 7, 20]}
+      position={[0, 1.5, 0]}
+    />
   );
 };
 

@@ -1,14 +1,13 @@
 import { Canvas } from "@react-three/fiber";
 import {
   Loader,
+  Environment,
   PointerLockControls,
 } from "@react-three/drei";
-import {
-  Physics,
-  Debug,
-} from "@react-three/cannon";
+import { Physics } from "@react-three/cannon";
 import Lights from "../components/Lights.js";
-import Floor from "../components/Floor.js";
+import NightSky from "../assets/environmentMaps/space.hdr";
+import { EffectComposer } from "@react-three/postprocessing";
 
 const BasicScene = ({ children }) => {
   return (
@@ -18,13 +17,15 @@ const BasicScene = ({ children }) => {
           args={["#000000"]}
           attach="background"
         />
+        <Environment
+          files={NightSky}
+          background
+        />
         <Lights />
         <Physics gravity={[0, -9.8, 0]}>
-          <Debug color="black" scale={1.1}>
-            {children}
-          </Debug>
+          {children}
         </Physics>
-        {/* <PointerLockControls /> */}
+        <PointerLockControls />
       </Canvas>
       <Loader />
     </>
