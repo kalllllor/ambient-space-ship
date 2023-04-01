@@ -17,7 +17,6 @@ const BaseCharacter = (props) => {
   const { camera } = useThree();
 
   const [ref, api] = useSphere((index) => ({
-    mass: 1,
     type: "Dynamic",
 
     position: [0, 10, 0],

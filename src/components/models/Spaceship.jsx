@@ -1,16 +1,56 @@
-import React, { useRef } from "react";
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
 import {
-  glassMaterial,
-  wallMaterial,
-  floorMaterial,
-  wallElementsMaterial,
-  whiteLightMaterial,
-} from "../../utils/Materials";
+  useFrame,
+  useThree,
+  useLoader,
+} from "@react-three/fiber";
+import {
+  useGLTF,
+  PositionalAudio,
+} from "@react-three/drei";
+import { glassMaterial } from "../../utils/Materials";
+import vertexShader from "./shaders/vertexShader";
+import fragmentShader from "./shaders/fragmentShader";
+
+function Sound({ url }) {
+  const sound = useRef();
+  const { camera } = useThree();
+  const [listener] = useState(
+    () => new THREE.AudioListener()
+  );
+  const buffer = useLoader(
+    THREE.AudioLoader,
+    url
+  );
+  useEffect(() => {
+    setTimeout(() => {
+      sound.current.setBuffer(buffer);
+      sound.current.setRefDistance(1);
+      sound.current.setLoop(true);
+      sound.current.play();
+      camera.add(listener);
+    }, 1000);
+    return () => camera.remove(listener);
+  }, []);
+  return (
+    <positionalAudio
+      ref={sound}
+      args={[listener]}
+    />
+  );
+}
 
 export function Spaceship(props) {
+  //useframe and useRef
+  const ventilationRef = useRef();
+  const shaderMatRef = useRef();
+
   //utils
   const setupMaterial = (
     name,
@@ -26,9 +66,30 @@ export function Spaceship(props) {
     materials[name].toneMapped = false;
   };
 
+  const { camera } = useThree();
+
+  // const listener = new THREE.AudioListener();
+  // camera.add(listener);
+
+  // const sound = new THREE.PositionalAudio(
+  //   listener
+  // );
+
+  // const audioLoader = new THREE.AudioLoader();
+  // audioLoader.load(
+  //   "/sounds/alarm.mp3",
+  //   function (buffer) {
+  //     sound.autoplay = true;
+  //     sound.setBuffer(buffer);
+  //     sound.setRefDistance(20);
+  //   }
+  // );
+
+  // console.log(soundRef.current);
+
   //setup
   const { nodes, materials } = useGLTF(
-    "/models/spaceship_master-transformed.glb"
+    "/models/spaceship_master2-transformed.glb"
   );
 
   setupMaterial("light_roof", [1.5, 1, 2], 1);
@@ -41,9 +102,26 @@ export function Spaceship(props) {
   setupMaterial("green diode", [0.2, 2, 0.2], 1);
   setupMaterial("little light", [2, 0.2, 0.2], 3);
 
-  //useframe and useRef
-  const ventilationRef = useRef();
-  useFrame((state, delta, xrFrame) => {
+  const floorMat = new THREE.MeshStandardMaterial(
+    {
+      color: "#404040",
+      emissive: "#000000",
+      roughness: 1,
+      metalness: 0.0,
+      side: 2,
+
+      flatShading: true,
+    }
+  );
+
+  const uniforms = useMemo(() => {
+    return {
+      u_time: { type: "f", value: 0 },
+    };
+  }, []);
+
+  useFrame(({ clock }) => {
+    const time = clock.getElapsedTime();
     if (Math.random() > 0.1) {
       setupMaterial(
         "green diode",
@@ -62,7 +140,9 @@ export function Spaceship(props) {
     } else {
       setupMaterial("light_roof", [1.5, 1, 2], 0);
     }
-    ventilationRef.current.rotation.y += 0.05;
+    ventilationRef.current.rotation.y += 0.01;
+
+    uniforms.u_time.value = time;
   });
 
   return (
@@ -75,7 +155,7 @@ export function Spaceship(props) {
         geometry={
           nodes.floor_rectangles_base.geometry
         }
-        material={materials["floor inside"]}
+        material={floorMat}
       />
       <mesh
         geometry={nodes.floor_rectangles.geometry}
@@ -89,7 +169,7 @@ export function Spaceship(props) {
         geometry={
           nodes.floor_rectangles_base002.geometry
         }
-        material={materials["floor inside"]}
+        material={floorMat}
       />
       <mesh
         geometry={
@@ -334,8 +414,20 @@ export function Spaceship(props) {
       />
       <mesh
         geometry={nodes.tablet001.geometry}
-        material={materials.light_roof}
-      />
+        position={nodes.tablet001.position}
+        scale={nodes.tablet001.scale}
+        rotation={nodes.tablet001.rotation}
+      >
+        <Sound url="/sounds/alarm.mp3" />
+        <shaderMaterial
+          ref={shaderMatRef}
+          uniforms={uniforms}
+          wireframe
+          fragmentShader={fragmentShader}
+          vertexShader={vertexShader}
+        />
+      </mesh>
+
       <mesh
         geometry={
           nodes.floor_ventilation.geometry
@@ -363,5 +455,5 @@ export function Spaceship(props) {
 }
 
 useGLTF.preload(
-  "/models/spaceship_master-transformed.glb"
+  "/models/spaceship_master2-transformed.glb"
 );

@@ -9,12 +9,13 @@ const Neptun = () => {
   const neptunRef = useRef();
 
   const amplitude = 70;
-  const factor = 0.1;
+  const factor = 0.2;
+  let a = 0;
   useFrame(({ clock }) => {
-    neptunRef.current.rotation.y += 0.0001;
+    neptunRef.current.rotation.y += 0.001;
 
-    const a = clock.getElapsedTime();
-
+    a += 0.05;
+    console.log(a);
     neptunRef.current.position.x =
       600 + amplitude * Math.sin(a * factor);
 
