@@ -33,7 +33,7 @@ const Lights = () => {
         ref={spotLightRef}
       />
 
-      <ambientLight intensity={0.1} />
+      <ambientLight intensity={0.2} />
       <spotLight
         ref={spotLightRef}
         intensity={1}

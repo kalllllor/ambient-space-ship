@@ -10,6 +10,8 @@ import Cube from "./components/Cube";
 import {
   EffectComposer,
   Bloom,
+  Noise,
+  Vignette,
 } from "@react-three/postprocessing";
 const Experience = () => {
   return (
@@ -21,6 +23,12 @@ const Experience = () => {
         color="yellow"
       />
       <EffectComposer>
+        <Noise opacity={0.05} />
+        <Vignette
+          eskil={false}
+          offset={0.1}
+          darkness={1.2}
+        />
         <Bloom mipmapBlur />
       </EffectComposer>
       {/* <OrbitControls makeDefault /> */}

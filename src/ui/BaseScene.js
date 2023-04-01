@@ -7,12 +7,34 @@ import {
 import { Physics } from "@react-three/cannon";
 import Lights from "../components/Lights.js";
 import NightSky from "../assets/environmentMaps/space.hdr";
-import { EffectComposer } from "@react-three/postprocessing";
 
+import useCapture from "use-capture";
+
+import "./style.css";
 const BasicScene = ({ children }) => {
+  const [bind, startRecording, isRecording] =
+    useCapture({
+      duration: 10,
+      fps: 30,
+    });
+
   return (
-    <>
-      <Canvas camera={{ fov: 50 }}>
+    <div className="wrapper">
+      <button
+        className="recording"
+        onClick={startRecording}
+      >
+        {isRecording
+          ? "Recording..."
+          : "Start Recording"}
+      </button>
+      <Canvas
+        camera={{ fov: 50 }}
+        onCreated={bind}
+        gl={{
+          preserveDrawingBuffer: true,
+        }}
+      >
         <color
           args={["#000000"]}
           attach="background"
@@ -28,7 +50,7 @@ const BasicScene = ({ children }) => {
         <PointerLockControls />
       </Canvas>
       <Loader />
-    </>
+    </div>
   );
 };
 

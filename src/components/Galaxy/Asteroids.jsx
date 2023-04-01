@@ -1,92 +1,94 @@
-import {
-  useLayoutEffect,
-  useEffect,
-} from "react";
+import { useLayoutEffect } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   useThree,
   useFrame,
 } from "@react-three/fiber";
 
-import { useTexture } from "@react-three/drei";
-
 const parameters = {
-  count: 5000,
+  count: 1500,
   size: 1,
-  radius: 150,
-  radiusRandomness: 150,
+  radius: 120,
+  radiusRandomness: 170,
+  size: 0.7,
 };
 
 let geometry = null;
 let material = null;
-let points = null;
+let asteroids = new THREE.Group();
+
+const gltfloader = new GLTFLoader();
+let asteroidGeo = null;
+gltfloader.load(
+  "/models/asteroid_lowpoly.glb",
+  (gltf) => {
+    asteroidGeo = gltf.scene.children[0].geometry;
+  }
+);
 
 function Asteroids() {
   const { scene } = useThree();
-  const asteroidsMap = useTexture(
-    "/textures/asteroid.png"
-  );
-
   useFrame((state, delta, xrFrame) => {
-    points.rotation.y += 0.0001;
+    asteroids.children.forEach(function (obj) {
+      obj.rotation.x -= obj.r.x;
+      obj.rotation.y -= obj.r.y;
+      obj.rotation.z -= obj.r.z;
+    });
+
+    asteroids.rotation.y += 0.0001;
   });
   useLayoutEffect(() => {
-    points.rotation.z = Math.PI / 24;
+    generateAsteroids();
   }, []);
 
-  const generateGalaxy = () => {
-    if (points) {
-      geometry.dispose();
-      material.dispose();
-      scene.remove(points);
-    }
-
-    /* Geometry */
-    geometry = new THREE.BufferGeometry();
-    const position = new Float32Array(
-      parameters.count * 3
-    );
+  const generateAsteroids = () => {
+    material = new THREE.MeshStandardMaterial({
+      color: "#aaaaaa",
+      roughness: 0.8,
+      metalness: 1,
+    });
 
     for (let i = 0; i < parameters.count; i++) {
-      const i3 = i * 3;
+      const cube = new THREE.Mesh(
+        asteroidGeo,
+        material
+      );
       const randomVal = Math.random();
-      position[i3] =
+      cube.position.x =
         parameters.radius *
           Math.cos(randomVal * 10) +
         (Math.random() - 0.5) *
           parameters.radiusRandomness;
-      position[i3 + 1] =
+      cube.position.y =
         (Math.random() - 0.5) * 15;
-      position[i3 + 2] =
+      cube.position.z =
         parameters.radius *
           Math.sin(randomVal * 10) +
         (Math.random() - 0.5) *
           parameters.radiusRandomness;
+
+      cube.r = {};
+      cube.r.x = Math.random() * 0.002;
+      cube.r.y = Math.random() * 0.002;
+      cube.r.z = Math.random() * 0.002;
+
+      cube.scale.set(
+        1 + Math.random() * 0.4,
+        1 + Math.random() * 0.8,
+        1 + Math.random() * 0.4
+      );
+      cube.scale.set(
+        randomVal * parameters.size,
+        randomVal * parameters.size,
+        randomVal * parameters.size
+      );
+
+      asteroids.add(cube);
     }
-
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(position, 3)
-    );
-
-    /* Materials */
-    material = new THREE.PointsMaterial({
-      size: parameters.size,
-      sizeAttenuation: true,
-      depthWrite: false,
-      color: new THREE.Vector3(0, 0, 0),
-      blending: THREE.AdditiveBlending,
-      alphaMap: asteroidsMap,
-      map: asteroidsMap,
-      alphaTest: 0.001,
-    });
-
-    /* Points */
-    points = new THREE.Points(geometry, material);
-    scene.add(points);
   };
 
-  generateGalaxy();
+  scene.add(asteroids);
 
   return null;
 }
